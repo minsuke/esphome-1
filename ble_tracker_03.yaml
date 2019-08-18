@@ -1,0 +1,56 @@
+---
+esphome:
+  name: ble_tracker_03
+  platform: ESP32
+  board: nodemcu-32s
+
+wifi:
+  ssid: !secret esphome_wifi_ssid
+  password: !secret esphome_wifi_password
+  domain: !secret esphome_domain
+
+api:
+  password: !secret esphome_api_password
+
+ota:
+  password: !secret esphome_ota_password
+
+logger:
+  baud_rate: 0
+
+uart:
+  rx_pin: RX
+  baud_rate: 4800
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    timezone: 'America/New_York'
+
+text_sensor:
+  - platform: version
+    name: "BLE Tracker 03 ESPHome Version"
+
+esp32_ble_tracker:
+
+binary_sensor:
+  - platform: ble_presence
+    mac_address: !secret tile_daniel
+    name: "ble_tracker_03_tile_daniel"
+    filters:
+      - delayed_off: 120s
+  - platform: ble_presence
+    mac_address: !secret tile_mariah
+    name: "ble_tracker_03_tile_mariah"
+    filters:
+      - delayed_off: 120s
+
+sensor:
+  - platform: uptime
+    name: "BLE Tracker 03 Uptime"
+  - platform: ble_rssi
+    mac_address: !secret tile_daniel
+    name: "ble_tracker_03_tile_daniel_rssi"
+  - platform: ble_rssi
+    mac_address: !secret tile_mariah
+    name: "ble_tracker_03_tile_mariah_rssi"

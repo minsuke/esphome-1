@@ -1,0 +1,80 @@
+---
+esphome:
+  name: box_fan_01_switch
+  platform: ESP8266
+  board: esp01_1m
+
+wifi:
+  ssid: !secret esphome_wifi_ssid
+  password: !secret esphome_wifi_password
+  domain: !secret esphome_domain
+
+api:
+  password: !secret esphome_api_password
+
+ota:
+  password: !secret esphome_ota_password
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO10
+      mode: INPUT_PULLUP
+      inverted: true
+    id: button
+    internal: true
+    on_press:
+      then:
+        if:
+          condition:
+            - switch.is_off: relay_low
+            - switch.is_off: relay_high
+          then:
+            switch.turn_on: relay_low
+          else:
+            if:
+              condition:
+                switch.is_on: relay_low
+              then:
+                switch.turn_on: relay_high
+              else:
+                if:
+                  condition:
+                    switch.is_on: relay_high
+                  then:
+                    switch.turn_off: relay_high
+
+switch:
+  - platform: restart
+    name: "Box Fan 01 Switch Restart"
+  - platform: gpio
+    name: "Box Fan 01 High"
+    pin: GPIO12
+    id: relay_high
+    interlock: [relay_low]
+  - platform: gpio
+    name: "Box Fan 01 Low"
+    pin: GPIO05
+    id: relay_low
+    interlock: [relay_high]
+
+status_led:
+  pin:
+    number: GPIO13
+    inverted: true
+
+logger:
+  baud_rate: 0
+
+uart:
+  rx_pin: RX
+  baud_rate: 4800
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    timezone: 'America/New_York'
+
+text_sensor:
+  - platform: version
+    name: "Box Fan 01 ESPHome Version"

@@ -1,0 +1,79 @@
+---
+esphome:
+  name: expedit_family_room_switch
+  platform: ESP8266
+  board: esp01_1m
+  on_boot:
+    priority: -10
+    then:
+      - switch.turn_on: relay
+
+wifi:
+  ssid: !secret esphome_wifi_ssid
+  password: !secret esphome_wifi_password
+  domain: !secret esphome_domain
+
+api:
+  password: !secret esphome_api_password
+
+ota:
+  password: !secret esphome_ota_password
+
+binary_sensor:
+  - platform: gpio
+    name: "Expedit Family Room Button"
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: true
+    on_press:
+      - switch.toggle: relay
+
+switch:
+  - platform: restart
+    name: "Expedit Family Room Switch Restart"
+  - platform: gpio
+    name: "Expedit Family Room Relay"
+    pin: GPIO12
+    id: relay
+    on_turn_off:
+      - delay: 15s
+      - switch.turn_on: relay
+
+status_led:
+  pin:
+    number: GPIO13
+    inverted: true
+
+logger:
+  baud_rate: 0
+
+uart:
+  rx_pin: RX
+  baud_rate: 4800
+
+sensor:
+  - platform: cse7766
+    current:
+      name: "Expedit Family Room Current"
+    voltage:
+      name: "Expedit Family Room Voltage"
+    power:
+      name: "Expedit Family Room Power"
+      id: my_power
+
+  - platform: total_daily_energy
+    name: "Expedit Family Room Total Daily Energy"
+    power_id: my_power
+
+  - platform: uptime
+    name: "Expedit Family Room Uptime"
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    timezone: 'America/New_York'
+
+text_sensor:
+  - platform: version
+    name: "Expedit Family Room ESPHome Version"

@@ -1,0 +1,83 @@
+---
+esphome:
+  name: coffee_grinder_switch
+  platform: ESP8266
+  board: esp01_1m
+
+wifi:
+  ssid: !secret esphome_wifi_ssid
+  password: !secret esphome_wifi_password
+  domain: !secret esphome_domain
+
+api:
+  password: !secret esphome_api_password
+  services:
+    - service: start_morning_grind
+      variables:
+        grind_duration_millis: int
+      then:
+        - switch.turn_on: relay
+        - delay: !lambda 'return grind_duration_millis;'
+        - switch.turn_off: relay
+
+ota:
+  password: !secret esphome_ota_password
+
+binary_sensor:
+  - platform: gpio
+    internal: true
+    name: "Coffee Grinder Button"
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: true
+    on_press:
+      then:
+        - switch.toggle: relay
+
+switch:
+  - platform: restart
+    name: "Coffee Grinder Switch Restart"
+  - platform: gpio
+    name: "Coffee Grinder Relay"
+    pin: GPIO12
+    id: relay
+    internal: true
+
+status_led:
+  pin:
+    number: GPIO13
+    inverted: true
+
+logger:
+  baud_rate: 0
+
+uart:
+  rx_pin: RX
+  baud_rate: 4800
+
+sensor:
+  - platform: cse7766
+    current:
+      name: "Coffee Grinder Current"
+    voltage:
+      name: "Coffee Grinder Voltage"
+    power:
+      name: "Coffee Grinder Power"
+      id: my_power
+
+  - platform: total_daily_energy
+    name: "Coffee Grinder Total Daily Energy"
+    power_id: my_power
+
+  - platform: uptime
+    name: "Coffee Grinder Uptime"
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    timezone: 'America/New_York'
+
+text_sensor:
+  - platform: version
+    name: "Coffee Grinder ESPHome Version"
