@@ -33,7 +33,7 @@ executors:
       - image: esphome/esphome:latest
   esphome_beta_executor:
     docker:
-      - image:  esphome/esphome:beta
+      - image: esphome/esphome:beta
 
 jobs:
   test_esphome_latest:
@@ -59,7 +59,8 @@ jobs:
           name: yamllint
           command: |
             yamllint --version
-            for file in $(find ~/repo -type f \( -name "*.yaml" -o -name "*.yml" \)); do
+            for file in $(find ~/repo -type f \
+              \( -name "*.yaml" -o -name "*.yml" \)); do
               yamllint $file
             done
 
