@@ -1,0 +1,76 @@
+---
+version: 2.1
+# ESPHome base template
+commands:
+  esphome_setup:
+    steps:
+      - run:
+          name: Setup environment variables
+          command: |
+            echo "export PYTHONPATH=/usr/src/app:$PYTHONPATH" >> $BASHENV
+      - run:
+          name: Print version
+          command: esphome dummy.yaml version
+      - run:
+          name: Copy secrets stub
+          command: cp -R ./.stubs/* ./esphome/config/
+  esphome_test:
+    steps:
+      - run:
+          name: Test ESPHome
+          command: |
+            for file in $(find ./esphome/config -type f -name "*.yaml" \
+              -not -name "secrets.yaml" ); do
+              esphome $file config
+            done
+
+executors:
+  yaml_executor:
+    docker:
+      - image: sdesbure/yamllint
+  esphome_latest_executor:
+    docker:
+      - image: esphome/esphome:latest
+  esphome_beta_executor:
+    docker:
+      - image:  esphome/esphome:beta
+
+jobs:
+  test_esphome_latest:
+    executor: esphome_latest_executor
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - esphome_setup
+      - esphome_test
+  test_esphome_beta:
+    executor: esphome_beta_executor
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - esphome_setup
+      - esphome_test
+  lint_yaml:
+    executor: yaml_executor
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run:
+          name: yamllint
+          command: |
+            yamllint --version
+            for file in $(find ~/repo -type f \( -name "*.yaml" -o -name "*.yml" \)); do
+              yamllint $file
+            done
+
+workflows:
+  version: 2
+  lint_and_test:
+    jobs:
+      - lint_yaml
+      - test_esphome_latest:
+          requires:
+            - lint_yaml
+      - test_esphome_beta:
+          requires:
+            - lint_yaml
