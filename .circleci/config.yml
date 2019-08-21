@@ -7,7 +7,7 @@ commands:
       - run:
           name: Setup environment variables
           command: |
-            echo "export PYTHONPATH=/usr/src/app:$PYTHONPATH" >> $BASHENV
+            echo "export PYTHONPATH=/usr/src/app:$PYTHONPATH" >> $BASH_ENV
       - run:
           name: Print version
           command: esphome dummy.yaml version
