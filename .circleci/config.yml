@@ -12,8 +12,8 @@ commands:
           name: Print version
           command: esphome dummy.yaml version
       - run:
-          name: Copy secrets stub
-          command: cp -R ./.stubs/* ./esphome/config/
+          name: rename secrets stub
+          command: mv .ci_secrets.yaml secrets.yaml
   esphome_test:
     steps:
       - run:
