@@ -19,7 +19,7 @@ commands:
       - run:
           name: Test ESPHome
           command: |
-            for file in $(find ./esphome/config -type f -name "*.yaml" \
+            for file in $(find ~/repo -type f -name "*.yaml" \
               -not -name "secrets.yaml" ); do
               esphome $file config
             done
