@@ -131,9 +131,9 @@ sensor:
       then:
         - lambda: 'id(grind_duration) = x;'
         - logger.log:
-              tag: "globals"
-              format: "Setting grind_duration to %i"
-              args: ['id(grind_duration)']
+            tag: "globals"
+            format: "Setting grind_duration to %i"
+            args: ['id(grind_duration)']
         - switch.turn_on: relay
         - delay: !lambda 'return id(grind_duration);'
         - switch.turn_off: relay
