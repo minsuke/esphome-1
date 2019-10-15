@@ -17,20 +17,8 @@ api:
         grind_duration_millis: int
       then:
         - switch.turn_on: relay
-        - delay: !lambda 'return grind_duration_millis;'
+        - delay: !lambda "return grind_duration_millis;"
         - switch.turn_off: relay
-
-mqtt:
-  broker: !secret mqtt_broker_ip
-  client_id: coffee_switch
-  topic_prefix: esp
-  birth_message:
-    topic: "esp/coffee_switch/status"
-    payload: "online"
-  will_message:
-    topic: "esp/coffee_switch/status"
-    payload: "offline"
-
 
 ota:
   password: !secret esphome_ota_password
@@ -39,7 +27,7 @@ globals:
   - id: grind_duration
     type: int
     restore_value: true
-    initial_value: '18000'
+    initial_value: "18000"
 
 binary_sensor:
   - platform: gpio
@@ -52,7 +40,7 @@ binary_sensor:
     on_press:
       then:
         - switch.turn_on: relay
-        - delay: !lambda 'return id(grind_duration);'
+        - delay: !lambda "return id(grind_duration);"
         - switch.turn_off: relay
 
 switch:
@@ -100,48 +88,12 @@ sensor:
     id: grind_duration_millis
     on_value:
       then:
-        - lambda: 'id(grind_duration) = (int)x;'
-
-  - platform: mqtt_subscribe
-    name: "MQTT Grind Duration"
-    internal: true
-    topic: "esp/coffee_switch/duration/set"
-    qos: 1
-    on_value:
-      then:
-        - lambda: 'id(grind_duration) = x;'
-        - logger.log:
-            tag: "globals"
-            format: "Setting grind_duration to %i"
-            args: ['id(grind_duration)']
-        - homeassistant.service:
-            service: input_number.set_value
-            data_template:
-              entity_id: input_number.grind_duration_millis
-              value: '{{ duration }}'
-            variables:
-              duration: !lambda 'return id(grind_duration);'
-
-  - platform: mqtt_subscribe
-    name: "MQTT Grind Start"
-    internal: true
-    topic: "esp/coffee_switch/switch/set"
-    qos: 1
-    on_value:
-      then:
-        - lambda: 'id(grind_duration) = x;'
-        - logger.log:
-            tag: "globals"
-            format: "Setting grind_duration to %i"
-            args: ['id(grind_duration)']
-        - switch.turn_on: relay
-        - delay: !lambda 'return id(grind_duration);'
-        - switch.turn_off: relay
+        - lambda: "id(grind_duration) = (int)x;"
 
 time:
   - platform: homeassistant
     id: homeassistant_time
-    timezone: 'America/New_York'
+    timezone: "America/New_York"
 
 text_sensor:
   - platform: version
