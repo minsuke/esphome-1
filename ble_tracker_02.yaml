@@ -25,7 +25,7 @@ uart:
 time:
   - platform: homeassistant
     id: homeassistant_time
-    timezone: 'America/New_York'
+    timezone: "America/New_York"
 
 text_sensor:
   - platform: version
@@ -54,3 +54,7 @@ sensor:
   - platform: ble_rssi
     mac_address: !secret tile_mariah
     name: "ble_tracker_02_tile_mariah_rssi"
+
+switch:
+  - platform: restart
+    name: "BLE Tracker 02 Restart"
